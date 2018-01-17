@@ -8,7 +8,7 @@ pub struct Context{
     context: &'static ohmd_context
 }
 
-pub struct OpenHMDDevice{
+pub struct Device{
     device: &'static ohmd_device
 }
 
@@ -39,9 +39,9 @@ impl Context{
         }
     }
 
-    pub fn list_open_device(&self, index: i32) -> OpenHMDDevice{
+    pub fn list_open_device(&self, index: i32) -> Device{
         unsafe{
-            OpenHMDDevice{
+            Device{
                 device: ohmd_list_open_device(self.context, index)
             }
         }
@@ -54,7 +54,7 @@ impl Context{
     }
 }
 
-impl OpenHMDDevice{
+impl Device{
     pub fn getf(&self, otype: ohmd_float_value) -> [f32; 16]{
         let mut out: [f32; 16] = [0.0, 0.0, 0.0, 0.0,0.0, 0.0, 0.0, 0.0,0.0, 0.0, 0.0, 0.0,0.0, 0.0, 0.0, 0.0];
         unsafe{
@@ -63,11 +63,11 @@ impl OpenHMDDevice{
         out
     }
 
-    pub fn geti(&self, otype: ohmd_int_value) -> [i32; 1]{
+    pub fn geti(&self, otype: ohmd_int_value) -> i32{
         let mut out: [i32; 1] = [0];
         unsafe{
             ohmd_device_geti(self.device, otype, &mut out);
         }
-        out
+        out[0]
     }
 }
