@@ -21,12 +21,6 @@ impl Context{
         }
     }
 
-    pub fn destroy(&self){
-        unsafe{
-            ohmd_ctx_destroy(self.context);
-        }
-    }
-
     pub fn probe(&self) -> i32{
         unsafe{
             ohmd_ctx_probe(self.context) as i32
@@ -50,6 +44,14 @@ impl Context{
     pub fn get_error(&self) -> i32{
         unsafe{
             ohmd_ctx_get_error(self.context) as i32
+        }
+    }
+}
+
+impl Drop for Context{
+    fn drop(&mut self){
+        unsafe{
+            ohmd_ctx_destroy(self.context);
         }
     }
 }
