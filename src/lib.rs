@@ -73,3 +73,11 @@ impl Device{
         out[0]
     }
 }
+
+impl Drop for Device{
+    fn drop(&mut self){
+        unsafe{
+            ohmd_close_device(self.device);
+        }
+    }
+}
