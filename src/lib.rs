@@ -21,12 +21,6 @@ impl Context{
         }
     }
 
-    pub fn destroy(&self){
-        unsafe{
-            ohmd_ctx_destroy(self.context);
-        }
-    }
-
     pub fn probe(&self) -> i32{
         unsafe{
             ohmd_ctx_probe(self.context) as i32
@@ -54,6 +48,14 @@ impl Context{
     }
 }
 
+impl Drop for Context{
+    fn drop(&mut self){
+        unsafe{
+            ohmd_ctx_destroy(self.context);
+        }
+    }
+}
+
 impl Device{
     pub fn getf(&self, otype: ohmd_float_value) -> [f32; 16]{
         let mut out: [f32; 16] = [0.0, 0.0, 0.0, 0.0,0.0, 0.0, 0.0, 0.0,0.0, 0.0, 0.0, 0.0,0.0, 0.0, 0.0, 0.0];
@@ -69,5 +71,13 @@ impl Device{
             ohmd_device_geti(self.device, otype, &mut out);
         }
         out[0]
+    }
+}
+
+impl Drop for Device{
+    fn drop(&mut self){
+        unsafe{
+            ohmd_close_device(self.device);
+        }
     }
 }
