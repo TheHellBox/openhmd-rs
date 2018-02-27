@@ -111,9 +111,11 @@ impl Context{
         }
     }
 
-    pub fn list_gets(&self, index: i32, otype: ohmd_string_value) -> i32{
+    pub fn list_gets(&self, index: i32, otype: ohmd_string_value) -> &str{
+        use std::ffi::CStr;
         unsafe{
-            ohmd_list_gets(self.context, index, otype) as i32
+            let raw = ohmd_list_gets(self.context, index, otype);
+            CStr::from_ptr(raw).to_str().unwrap()
         }
     }
 }
