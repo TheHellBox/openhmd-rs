@@ -7,4 +7,4 @@ license="MIT"
 repository = "https://github.com/TheHellBox/openhmd-rs"
 
 [dependencies]
-openhmd-rs-sys="0.1.4"
+openhmd-rs-sys="0.1.5"
