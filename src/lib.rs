@@ -127,20 +127,26 @@ impl Drop for Context{
 }
 
 impl Device{
-    pub fn getf(&self, otype: ohmd_float_value) -> [f32; 16]{
+    pub fn getf(&self, otype: ohmd_float_value) -> Option<[f32; 16]>{
         let mut out: [f32; 16] = [0.0, 0.0, 0.0, 0.0,0.0, 0.0, 0.0, 0.0,0.0, 0.0, 0.0, 0.0,0.0, 0.0, 0.0, 0.0];
         unsafe{
-            ohmd_device_getf(self.device, otype, &mut out);
+            match ohmd_device_getf(self.device, otype, &mut out){
+                0 => return Some(out),
+                _ => return None
+            };
         }
-        out
+        Some(out)
     }
 
-    pub fn geti(&self, otype: ohmd_int_value) -> i32{
+    pub fn geti(&self, otype: ohmd_int_value) -> Option<i32>{
         let mut out: [i32; 1] = [0];
         unsafe{
-            ohmd_device_geti(self.device, otype, &mut out);
+            match ohmd_device_geti(self.device, otype, &mut out){
+                0 => return Some(out[0]),
+                _ => return None
+            };
         }
-        out[0]
+        Some(out[0])
     }
     fn close(&self) -> i32{
         unsafe{
