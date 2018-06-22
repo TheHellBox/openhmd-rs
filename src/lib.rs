@@ -138,6 +138,16 @@ impl Device{
         Some(out)
     }
 
+	pub fn setf(&self, otype: ohmd_float_value, value: &[f32; 16]) -> Option<bool>{
+        unsafe{
+            match ohmd_device_setf(self.device, otype, value){
+                0 => return Some(true),
+                _ => return None
+            };
+        }
+        Some(true)
+    }
+
     pub fn geti(&self, otype: ohmd_int_value) -> Option<i32>{
         let mut out: [i32; 1] = [0];
         unsafe{
