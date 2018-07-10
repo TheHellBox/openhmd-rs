@@ -6,7 +6,7 @@ fn main(){
     println!("{}", context.probe());
     let device = context.list_open_device(0);
     context.update();
-    println!("OHMD_ROTATION_QUAT {:?}", device.getf(ohmd_float_value::OHMD_ROTATION_QUAT));
-    println!("OHMD_SCREEN_HORIZONTAL_RESOLUTION {:?}", device.geti(ohmd_int_value::OHMD_SCREEN_HORIZONTAL_RESOLUTION));
-    println!("OHMD_SCREEN_VERTICAL_RESOLUTION {:?}", device.geti(ohmd_int_value::OHMD_SCREEN_VERTICAL_RESOLUTION));
+    println!("OHMD_ROTATION_QUAT {:?}", device.get_rotation_quat());
+    println!("OHMD_SCREEN_HORIZONTAL_RESOLUTION {:?}", device.get_scr_res_w());
+    println!("OHMD_SCREEN_VERTICAL_RESOLUTION {:?}", device.get_scr_res_h());
 }

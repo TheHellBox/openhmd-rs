@@ -12,7 +12,7 @@ pub struct Device{
     device: &'static ohmd_device
 }
 
-pub const shader_distortion_vert: &'static str  = r#"
+pub const SHADER_DISTORTION_VERT: &'static str  = r#"
 version 120
 void main(void)
 {
@@ -21,7 +21,7 @@ void main(void)
 }
 "#;
 
-pub const shader_distortion_frag: &'static str = r#"
+pub const SHADER_SIMPLE_FRAG: &'static str = r#"
 version 120
 
 //per eye texture to warp for lens distortion
@@ -135,7 +135,102 @@ impl Device{
                 _ => return None
             };
         }
-        Some(out)
+    }
+
+    pub fn get_rotation_quat(&self) -> [f32; 4]{
+        let ohmd_orient = match self.getf(ohmd_float_value::OHMD_ROTATION_QUAT){
+            Some(x) => [x[0], x[1], x[2], x[3]],
+            _ => [0.0,0.0,0.0,0.0]
+        };
+        ohmd_orient
+    }
+
+    pub fn get_position_vec(&self) -> [f32; 3]{
+        let ohmd_position = match self.getf(ohmd_float_value::OHMD_POSITION_VECTOR){
+            Some(x) => [x[0], x[1], x[2]],
+            _ => [0.0,0.0,0.0]
+        };
+        ohmd_position
+    }
+
+    pub fn get_view_matrix_l(&self) -> [f32; 16]{
+        let view_left = match self.getf(ohmd_float_value::OHMD_LEFT_EYE_GL_MODELVIEW_MATRIX){
+            Some(x) => x,
+            None => [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,0.0, 0.0, 0.0, 0.0,0.0, 0.0, 0.0, 0.0]
+        };
+        view_left
+    }
+
+    pub fn get_view_matrix_r(&self) -> [f32; 16]{
+        let view_right = match self.getf(ohmd_float_value::OHMD_RIGHT_EYE_GL_MODELVIEW_MATRIX){
+            Some(x) => x,
+            None => [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,0.0, 0.0, 0.0, 0.0,0.0, 0.0, 0.0, 0.0]
+        };
+        view_right
+    }
+
+    pub fn get_proj_matrix_l(&self) -> [f32; 16]{
+        let oproj = match self.getf(ohmd_float_value::OHMD_LEFT_EYE_GL_PROJECTION_MATRIX){
+            Some(x) => x,
+            _ => [0.0, 0.0, 0.0, 0.0,0.0, 0.0, 0.0, 0.0,0.0, 0.0, 0.0, 0.0,0.0, 0.0, 0.0, 0.0]
+        };
+        oproj
+    }
+
+    pub fn get_proj_matrix_r(&self) -> [f32; 16]{
+        let oproj = match self.getf(ohmd_float_value::OHMD_RIGHT_EYE_GL_PROJECTION_MATRIX){
+            Some(x) => x,
+            _ => [0.0, 0.0, 0.0, 0.0,0.0, 0.0, 0.0, 0.0,0.0, 0.0, 0.0, 0.0,0.0, 0.0, 0.0, 0.0]
+        };
+        oproj
+    }
+
+    pub fn get_scr_size_w(&self) -> f32{
+        let scr_size_w = match self.getf(ohmd_float_value::OHMD_SCREEN_HORIZONTAL_SIZE){
+            Some(x) => x[0],
+            _ => 0.149760
+        };
+        scr_size_w
+    }
+
+    pub fn get_scr_size_h(&self) -> f32{
+        let scr_size_h = match self.getf(ohmd_float_value::OHMD_SCREEN_VERTICAL_SIZE ){
+            Some(x) => x[0],
+            _ => 0.093600
+        };
+        scr_size_h
+    }
+
+    pub fn get_scr_res_w(&self) -> u32{
+        let scrw = match self.geti(ohmd_int_value::OHMD_SCREEN_HORIZONTAL_RESOLUTION){
+            Some(x) => x,
+            _ => 1280
+        } as u32;
+        scrw
+    }
+
+    pub fn get_scr_res_h(&self) -> u32{
+        let scrh = match self.geti(ohmd_int_value::OHMD_SCREEN_VERTICAL_RESOLUTION){
+            Some(x) => x,
+            _ => 800
+        } as u32;
+        scrh
+    }
+
+    pub fn get_distortion_k(&self) -> [f32; 4]{
+        let distortion_k = match self.getf(ohmd_float_value::OHMD_UNIVERSAL_DISTORTION_K ){
+            Some(x) => [x[0], x[1], x[2], x[3]],
+            _ => [0.0,0.0,0.0,1.0]
+        };
+        distortion_k
+    }
+
+    pub fn get_aberration_k(&self) -> [f32; 3]{
+        let aberration_k = match self.getf(ohmd_float_value::OHMD_UNIVERSAL_ABERRATION_K ){
+            Some(x) =>  [x[0], x[1], x[2]],
+            _ => [0.0,0.0,1.0]
+        };
+        aberration_k
     }
 
 	pub fn setf(&self, otype: ohmd_float_value, value: &mut [f32; 16]) -> Option<bool>{
@@ -145,7 +240,6 @@ impl Device{
                 _ => return None
             };
         }
-        Some(true)
     }
 
     pub fn geti(&self, otype: ohmd_int_value) -> Option<i32>{
@@ -156,7 +250,6 @@ impl Device{
                 _ => return None
             };
         }
-        Some(out[0])
     }
     fn close(&self) -> i32{
         unsafe{
